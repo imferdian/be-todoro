@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Users {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  task      Tasks[]
+}
+
+model Tasks {
+  id     String @id @default(uuid())
+  task   String @unique
+  user   Users  @relation(fields: [userId], references: [id])
+  userId String
+  todo   Todo[]
+}
+
+model Todo {
+  id                String          @id @default(uuid())
+  todo              String          @unique
+  session_target    Int
+  session_completed Int
+  duration          DateTime
+  short_break       DateTime
+  long_break        DateTime
+  status            Status_todo
+  task              Tasks           @relation(fields: [taskId], references: [id])
+  taskId            String
+  focus_session     Focus_session[]
+}
+
+model Focus_session {
+  id               String       @id @default(uuid())
+  started_at       DateTime     @default(now())
+  ended_at         DateTime     @default(now())
+  duration_seconds Int
+  is_completed     Boolean
+  status           Status_focus
+  todo             Todo         @relation(fields: [todoId], references: [id])
+  todoId           String
+}
+
+enum Status_todo {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum Status_focus {
+  CANCELED
+  COMPLETED
+}
