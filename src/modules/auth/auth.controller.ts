@@ -1,113 +1,56 @@
-import { Elysia } from 'elysia';
-import * as authServices from './auth.services';
-import { AuthError } from './auth.types';
+import { authServices } from '.';
+import type { Context } from 'elysia';
 import {
-  RegisterBodySchema,
-  LoginBodySchema,
-  AuthResponseSchema,
-  ErrorResponseSchema,
-} from './auth.schema';
+  LoginRequestDto,
+  RegisterRequestDto,
+  toGetUserResponse,
+  toLoginResponse,
+  toRegisteredResponse,
+} from './dtos';
+import { AuthError } from './auth.error';
 
-export const authController = new Elysia({ prefix: '/auth' })
-  // Error handler
-  .onError(({ error, set }) => {
-    if (error instanceof AuthError) {
-      set.status = error.statusCode;
-      return {
-        succes: false,
-        message: error.message,
-        code: error.code,
-      };
-    }
+type RegisterContext = Context<{
+  body: RegisterRequestDto;
+}>;
 
-    console.error('Unexpected error:', error);
-    set.status = 500;
-    return {
-      success: false,
-      message: 'Internal Server Error',
-      code: 'INTERNAL_ERROR',
-    };
-  })
+type LoginContext = Context<{
+  body: LoginRequestDto;
+}>;
 
-  // Post /auth/register - Registrasi user baru
-  .post('/register', async({ body, set }) => {
-    const result = await authServices.register({
-      name: body.name,
-      email: body.email,
-      password: body.password,
-    });
+type AuthenticatedContext = Context<{
+  headers: {
+    authorization?: string;
+  };
+}>;
 
-    set.status = 201;
-    return {
-      success: true,
-      message: 'User registered successfully',
-      data: result,
-    };
-  },
-  {
-    body: RegisterBodySchema,
-    response: {
-      201: AuthResponseSchema,
-      409: ErrorResponseSchema,
-    },
-    detail: {
-      tags: ['Auth'],
-      summary: 'Register new user',
-      description: 'Create a new user account with email and password'
-    },
-  })
+// POST /auth/register - Register controller
+export const registerController = async ({ body, set }: RegisterContext) => {
+  const result = await authServices.register(body);
 
-  // Post /auth/login - Login user
-  .post('/login', async ({ body }) => {
-    const result = await authServices.login({
-      email: body.email,
-      password: body.password
-    })
-    return {
-      success: true,
-      message: 'User login successfully',
-      data: result,
-    }
-  },
-  {
-    body: LoginBodySchema,
-    response: {
-      200: AuthResponseSchema,
-      401: ErrorResponseSchema,
-    },
-    detail: {
-      tags: ['Auth'],
-      summary: 'Login user',
-      description: 'Login user with email and password'
-    },
-  })
+  set.status = 201;
+  return toRegisteredResponse(result.token, result.user);
+};
+
+// POST /auth/login - Login controller
+export const loginController = async ({ body }: LoginContext) => {
+  const result = await authServices.login(body);
+
+  return toLoginResponse(result.token, result.user, result.expiresAt);
+};
+
+// GET /auth/me - Get user controller
+export const getMeController = async ({ headers }: AuthenticatedContext) => {
+  // extract dan verifikasi token
+  const authHeader = headers.authorization;
   
-  // GET /auth/me - Get current user
-  .get('/me', async ({ headers, set }) => {
-    
-    const authHeader = headers.authorization;
-    
-    if(!authHeader || !authHeader?.startsWith('Bearer ')){
-      throw new AuthError('Authorization header required', 'UNAUTHORIZED')
-    };
-    
-    const token = authHeader.replace('Bearer', '');
-    const decoded = await authServices.verifyToken(token);
-    const user = await authServices.getUserById(decoded.userId);
-    
-    set.status = 200;
-    return {
-      success: true,
-      message: 'User retrieved successfully',
-      data: user,
-    };   
-  },
-  {
-    detail: {
-      tags: ['Auth'],
-      summary: 'Get current user',
-      description: 'Get the currently authenticated user profile'
-    }
-  })
+  if (!authHeader?.startsWith('Bearer ')) {
+    throw new AuthError('Authorization required', 'UNAUTHORIZED');
+  }
+  
+  const token = authHeader.replace('Bearer ', '');
+  const decoded = await authServices.verifyToken(token);
+  // ambil user dari services
+  const user = await authServices.getUserById(decoded.userId);
 
-
+  return toGetUserResponse(user);
+};

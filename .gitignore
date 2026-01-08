@@ -43,6 +43,5 @@ package-lock.json
 **/*.bun
 /src/generated/prisma
 
-.prettierrc
 backend-architecture.md
 docs/

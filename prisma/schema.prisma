@@ -14,13 +14,14 @@ datasource db {
 }
 
 model Users {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  task      Tasks[]
+  id         String   @id @default(uuid())
+  email      String   @unique
+  name       String
+  password   String
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  task       Tasks[]
 }
 
 model Tasks {
