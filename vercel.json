@@ -1,7 +1,9 @@
 {
+  "buildCommand": "bun install && bunx prisma generate",
+  "installCommand": "curl -fsSL https://bun.sh/install | bash && ~/.bun/bin/bun install",
   "functions": {
-    "api/index.ts": {
-      "runtime": "vercel-bun@0.0.1"
+    "api/**/*.ts": {
+      "runtime": "nodejs20.x"
     }
   },
   "rewrites": [
