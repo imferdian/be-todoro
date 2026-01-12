@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/index.ts": {
-      "runtime": "vercel-bun@1.1.1"
+      "runtime": "vercel-bun@0.0.1"
     }
   },
   "rewrites": [
