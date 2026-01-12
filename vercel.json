@@ -1,13 +1,13 @@
 {
   "functions": {
-      "src/index.ts": {
-          "runtime": "vercel-bun@1.3.5"
-      }
+    "api/index.ts": {
+      "runtime": "vercel-bun@1.1.1"
+    }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "src/index.ts"
+      "source": "/(.*)",
+      "destination": "/api"
     }
   ]
 }
