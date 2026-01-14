@@ -2,28 +2,37 @@ import { Elysia, ValidationError } from 'elysia';
 import {
   registerController,
   loginController,
-  getMeController
+  getMeController,
+  getVerificationEmailController,
+  resendVerificationController,
 } from './auth.controller';
 import { AuthError } from './auth.error';
 
-import { LoginRequestSchema, RegisterRequestSchema } from './dtos';
+import {
+  ErrorResponseSchema,
+  LoginRequestSchema,
+  RegisterRequestSchema,
+  ResendVerificationRequestSchema,
+  VerifyEmailQuerySchema,
+  VerifyEmailResponeSchema,
+} from './dtos';
+import { resendVerificationEmail } from './auth.services';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
   // Handle Error
-  .onError(({code, error, set }) => {
-    
+  .onError(({ code, error, set }) => {
     if (code === 'VALIDATION') {
       set.status = 400;
       const validationError = error as ValidationError;
-      
+
       return {
         success: false,
         message: 'Validation_error',
         code: code || 'VALIDATION_ERROR',
-        detail: validationError.all
-      }
+        detail: validationError.all,
+      };
     }
-    
+
     // Handle error pakai AuthError
     if (error instanceof AuthError) {
       set.status = error.statusCode;
@@ -37,6 +46,25 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       message: 'Internal server error',
       code: 'INTERNAL_ERROR',
     };
+  })
+
+  // GET /auth/verify-email
+  .get('/verify-email', getVerificationEmailController, {
+    query: VerifyEmailQuerySchema,
+    detail: {
+      tags: ['Auth'],
+      summary: 'Verify email',
+      description: 'Verify email address',
+    },
+  })
+  
+  .post('/resend-verification', resendVerificationController, {
+    body: ResendVerificationRequestSchema,
+    detail: {
+      tags: ['Auth'],
+      summary: 'Resend verification email',
+      description: 'Resend verification email to the user',
+    }
   })
 
   // POST /auth/register
