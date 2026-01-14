@@ -19,14 +19,6 @@ export const LoginResponseSchema = z.object({
   message: z.string(),
   data: z.object({
     token: z.jwt(),
-    user: z.object({
-      id: z.uuid(),
-      name: z.string(),
-      email: z.email(),
-      isVerified: z.boolean(),
-      createdAt: z.date(),
-      updatedAt: z.date(),
-    }),
     expiresAt: z.date(),
   }),
 });
@@ -35,15 +27,6 @@ export type LoginResponseDto = z.infer<typeof LoginResponseSchema>;
 
 export function toLoginResponse(
   token: string,
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    isVerified: boolean;
-    password: string;
-    createdAt: Date;
-    updatedAt: Date;
-  },
   expiresAt: Date
 ): LoginResponseDto {
   return {
@@ -51,14 +34,6 @@ export function toLoginResponse(
     message: 'Login successfully',
     data: {
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        isVerified: user.isVerified,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
       expiresAt,
     },
   };

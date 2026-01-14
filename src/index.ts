@@ -3,7 +3,6 @@ import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { authRoutes } from './modules/auth';
 
-
 const app = new Elysia()
   .use(cors())
   .use(
@@ -29,10 +28,9 @@ const app = new Elysia()
     timestamp: new Date().toISOString(),
   }))
   // API Routes
-  .group('/api/v1', (app) => app
-    .use(authRoutes))
+  .group('/api/v1', (app) => app.use(authRoutes))
 
-  .listen(process.env.PORT || 3000);
+  .listen(process.env.PORT || 5000);
 
 console.log(
   `Todoro API is running!

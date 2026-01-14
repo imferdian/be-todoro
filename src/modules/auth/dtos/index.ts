@@ -1,5 +1,4 @@
-
-export { 
+export {
   RegisterRequestSchema,
   RegisterResponseSchema,
   toRegisteredResponse,
@@ -7,7 +6,7 @@ export {
   type RegisterRequestDto,
 } from './register.dto';
 
-export { 
+export {
   LoginRequestSchema,
   LoginResponseSchema,
   toLoginResponse,
@@ -15,13 +14,13 @@ export {
   type LoginRequestDto,
 } from './login.dto';
 
-export { 
+export {
   UserResponseSchema,
   GetUserResponseSchema,
   type GetUserResponseDto,
   type UserResponseDto,
   toUserDto,
-  toGetUserResponse
+  toGetUserResponse,
 } from './user.dto';
 
 export {
@@ -29,6 +28,15 @@ export {
   IdParamsSchema,
   type ErrorResponseDto,
   type IdParamsDto,
-  toErrorResponse
-  
+  toErrorResponse,
 } from './common.dto';
+
+export {
+  VerifyEmailQuerySchema,
+  VerifyEmailResponeSchema,
+  ResendVerificationRequestSchema,
+  type VerifyEmailQueryDto,
+  type VerifyEmailResponseDto,
+  type ResendVerificationRequestDto,
+  toVerifyEmailResponse,
+} from './verify-email.dto';

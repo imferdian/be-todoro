@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: todoro-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: APP_NAME
+        value: Todoro
+      - key: FRONTEND_URL
+        sync: false
+      - key: VERIFICATION_TOKEN_EXPIRY_HOURS
+        value: '24'
