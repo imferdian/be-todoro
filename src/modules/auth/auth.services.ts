@@ -9,24 +9,28 @@ import {
   generateVerificationEmailText,
 } from './email/verification-email';
 
-interface AuthResult {
+interface RegisterResult {
   token: string;
   user: {
     id: string;
     name: string;
     email: string;
     isVerified: boolean;
-    password: string;
     createdAt: Date;
     updatedAt: Date;
   };
   expiresAt: Date;
 }
 
+interface LoginResult {
+  token: string;
+  expiresAt: Date;
+}
+
 // Register Services
 export const register = async (
   dto: RegisterRequestDto
-): Promise<AuthResult> => {
+): Promise<RegisterResult> => {
   // cek kalau sudah ada user
   const existingUser = await prisma.users.findUnique({
     where: { email: dto.email },
@@ -65,7 +69,7 @@ export const register = async (
 };
 
 // Login Services
-export const login = async (dto: LoginRequestDto): Promise<AuthResult> => {
+export const login = async (dto: LoginRequestDto): Promise<LoginResult> => {
   // Ambil user berdasarkan email
   const user = await prisma.users.findUnique({
     where: { email: dto.email },
@@ -91,7 +95,6 @@ export const login = async (dto: LoginRequestDto): Promise<AuthResult> => {
   // return token dan user
   return {
     token,
-    user,
     expiresAt,
   };
 };
