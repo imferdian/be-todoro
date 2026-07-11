@@ -5,18 +5,16 @@ import {
   getMeController,
   getVerificationEmailController,
   resendVerificationController,
+  logoutController,
 } from './auth.controller';
 import { AuthError } from './auth.error';
 
 import {
-  ErrorResponseSchema,
   LoginRequestSchema,
   RegisterRequestSchema,
   ResendVerificationRequestSchema,
   VerifyEmailQuerySchema,
-  VerifyEmailResponeSchema,
 } from './dtos';
-import { resendVerificationEmail } from './auth.services';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
   // Handle Error
@@ -57,14 +55,14 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       description: 'Verify email address',
     },
   })
-  
+
   .post('/resend-verification', resendVerificationController, {
     body: ResendVerificationRequestSchema,
     detail: {
       tags: ['Auth'],
       summary: 'Resend verification email',
       description: 'Resend verification email to the user',
-    }
+    },
   })
 
   // POST /auth/register
@@ -95,4 +93,13 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       description: 'Get the currently authenticated user profile',
       security: [{ bearerAuth: [] }],
     },
-  });
+  })
+  
+  .post('/logout', logoutController, {
+    detail: {
+      tags: ['Auth'],
+      summary: 'Logout user',
+      description: 'Logout the currently authenticated user',
+      security: [{ bearerAuth: [] }],
+    },
+  })

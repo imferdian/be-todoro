@@ -1,5 +1,4 @@
-export type AuthErrorCode =
-  | 'INVALID_CREDENTIALS'
+export type AuthErrorCode = 'INVALID_CREDENTIALS'
   | 'USER_EXISTS'
   | 'USER_NOT_FOUND'
   | 'INVALID_TOKEN'

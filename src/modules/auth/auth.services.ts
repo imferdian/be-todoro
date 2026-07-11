@@ -27,7 +27,7 @@ interface LoginResult {
   expiresAt: Date;
 }
 
-// Register Services
+// INFO: Register Services
 export const register = async (
   dto: RegisterRequestDto
 ): Promise<RegisterResult> => {
@@ -68,7 +68,7 @@ export const register = async (
   };
 };
 
-// Login Services
+// INFO: Login Services
 export const login = async (dto: LoginRequestDto): Promise<LoginResult> => {
   // Ambil user berdasarkan email
   const user = await prisma.users.findUnique({
@@ -99,7 +99,11 @@ export const login = async (dto: LoginRequestDto): Promise<LoginResult> => {
   };
 };
 
-// Get user
+export const logout = async (token: string) => {
+  await verifyToken(token);
+}
+
+// INFO: Get user
 export const getUserById = async (userId: string) => {
   // ambil user berdasarkan id
   const user = await prisma.users.findUnique({
@@ -114,7 +118,7 @@ export const getUserById = async (userId: string) => {
   return user;
 };
 
-// Verifikasi token JWT
+// INFO: Verifikasi token JWT
 export const verifyToken = async (token: string) => {
   try {
     const decoded = verify(token, process.env.JWT_SECRET_KEY!) as {
@@ -127,14 +131,14 @@ export const verifyToken = async (token: string) => {
   }
 };
 
-// definisi isi dari token verifikasi
+// INFO:definisi isi dari token verifikasi
 interface VerifyTokenPayload {
   userId: string;
   email: string;
   purpose: 'email_verification';
 }
 
-// generate token verifikasi
+// INFO: generate token verifikasi
 function generateVerificationToken(userId: string, email: string) {
   const expiryHours = parseInt(
     process.env.VERIFICATION_TOKEN_EXPIRY_HOURS || '24',
@@ -155,7 +159,7 @@ function generateVerificationToken(userId: string, email: string) {
   });
 }
 
-// verifikasi token verifikasi
+// INFO: verifikasi token verifikasi
 function verifyVerificationToken(token: string) {
   const secret =
     process.env.JWT_VERIFICATION_SECRET || process.env.JWT_SECRET_KEY!;
@@ -181,7 +185,7 @@ function verifyVerificationToken(token: string) {
   }
 }
 
-// Kirim verifikasi email menggunakan Resend
+// INFO: Kirim verifikasi email menggunakan Resend
 export const sendVerificationEmail = async (
   email: string,
   name: string,
@@ -221,7 +225,7 @@ export const sendVerificationEmail = async (
   }
 };
 
-// Verifikasi email dengan JWT token
+// INFO: Verifikasi email dengan JWT token
 export const verifyEmail = async (
   token: string
 ): Promise<{ email: string }> => {
@@ -266,6 +270,7 @@ export const verifyEmail = async (
   };
 };
 
+// INFO: Verifikasi email menggunakan resend
 export const resendVerificationEmail = async (email: string): Promise<void> => {
   const user = await prisma.users.findUnique({
     where: {
@@ -284,4 +289,3 @@ export const resendVerificationEmail = async (email: string): Promise<void> => {
   await sendVerificationEmail(user.email, user.name, user.id);
   
 }
-

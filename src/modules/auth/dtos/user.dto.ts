@@ -4,7 +4,6 @@ export const UserResponseSchema = z.object({
   id: z.uuid(),
   name: z.string(),
   email: z.email(),
-  isVerified: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -25,7 +24,6 @@ export function toUserDto(user: {
   id: string;
   name: string;
   email: string;
-  isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 }): UserResponseDto {
@@ -33,7 +31,6 @@ export function toUserDto(user: {
     id: user.id,
     name: user.name,
     email: user.email,
-    isVerified: user.isVerified,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };

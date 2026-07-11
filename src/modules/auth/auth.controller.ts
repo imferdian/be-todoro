@@ -9,7 +9,6 @@ import {
   toRegisteredResponse,
   toVerifyEmailResponse,
   VerifyEmailQueryDto,
-  VerifyEmailResponseDto,
 } from './dtos';
 import { AuthError } from './auth.error';
 
@@ -47,7 +46,18 @@ export const registerController = async ({ body, set }: RegisterContext) => {
 export const loginController = async ({ body }: LoginContext) => {
   const result = await authServices.login(body);
 
-  return toLoginResponse(result.token, result.user, result.expiresAt);
+  return toLoginResponse(result.token, result.expiresAt);
+};
+
+export const logoutController = async ({ headers }: AuthenticatedContext) => {
+  const authHeader = headers.authorization;
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    throw new AuthError('Authorization required', 'UNAUTHORIZED');
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  await authServices.logout(token);
 };
 
 // GET /auth/me - Get user controller
@@ -82,6 +92,6 @@ export const resendVerificationController = async ({
   set.status = 200;
   return {
     success: true,
-    message: 'Verification emaiol has been resent',
+    message: 'Verification email has been resent',
   };
 };

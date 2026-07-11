@@ -48,7 +48,6 @@ export function toRegisteredResponse(
     name: string;
     email: string;
     isVerified: boolean;
-    password: string;
     createdAt: Date;
     updatedAt: Date;
   }
