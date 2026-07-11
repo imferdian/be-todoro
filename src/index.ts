@@ -2,6 +2,7 @@ import cors from '@elysiajs/cors';
 import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { authRoutes } from './modules/auth';
+import { taskRoutes } from './modules/tasks';
 
 const app = new Elysia()
   .use(cors())
@@ -28,7 +29,7 @@ const app = new Elysia()
     timestamp: new Date().toISOString(),
   }))
   // API Routes
-  .group('/api/v1', (app) => app.use(authRoutes))
+  .group('/api/v1', (app) => app.use(authRoutes).use(taskRoutes))
 
   .listen(process.env.PORT || 5000);
 

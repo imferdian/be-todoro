@@ -25,25 +25,34 @@ model Users {
 }
 
 model Tasks {
-  id     String @id @default(uuid())
-  task   String @unique
-  user   Users  @relation(fields: [userId], references: [id])
-  userId String
-  todo   Todo[]
+  id          String @id @default(uuid())
+  title       String
+  description String @default("")
+  user        Users  @relation(fields: [userId], references: [id])
+  userId      String
+  todo        Todo[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([title, userId])
 }
 
 model Todo {
   id                String          @id @default(uuid())
-  todo              String          @unique
+  todo              String
   session_target    Int
   session_completed Int
-  duration          DateTime
-  short_break       DateTime
-  long_break        DateTime
+  duration          Int             @default(25)
+  short_break       Int             @default(5)
+  long_break        Int             @default(15)
   status            Status_todo
   task              Tasks           @relation(fields: [taskId], references: [id])
   taskId            String
   focus_session     Focus_session[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([todo, taskId])
 }
 
 model Focus_session {
