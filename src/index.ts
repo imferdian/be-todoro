@@ -4,7 +4,7 @@ import { swagger } from '@elysiajs/swagger';
 import { authRoutes } from './modules/auth/index';
 import { taskRoutes } from './modules/tasks/index';
 
-export const app = new Elysia()
+const app = new Elysia()
   .use(cors())
   .use(
     swagger({
@@ -29,7 +29,7 @@ export const app = new Elysia()
   }))
   .group('/api/v1', (app) => app.use(authRoutes).use(taskRoutes));
 
-// Hanya .listen() kalau BUKAN di environment Vercel
+// Hanya listen kalau di lokal, BUKAN saat di-build/deploy Vercel
 if (!process.env.VERCEL) {
   app.listen(process.env.PORT || 5000);
   console.log(
@@ -39,4 +39,5 @@ Swagger: http://${app.server?.hostname}:${app.server?.port}/swagger`
   );
 }
 
+export default app;
 export type App = typeof app;
