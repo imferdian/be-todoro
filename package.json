@@ -27,6 +27,5 @@
     "dotenv": "^17.2.3",
     "prisma": "^7.2.0"
   },
-  "module": "src/index.js",
   "type": "module"
 }
