@@ -1,8 +1,8 @@
 import cors from '@elysiajs/cors';
 import { Elysia } from 'elysia';
 import { swagger } from '@elysiajs/swagger';
-import { authRoutes } from './modules/auth';
-import { taskRoutes } from './modules/tasks';
+import { authRoutes } from './modules/auth/index';
+import { taskRoutes } from './modules/tasks/index';
 
 export const app = new Elysia()
   .use(cors())
