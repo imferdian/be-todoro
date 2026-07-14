@@ -4,7 +4,7 @@ import { swagger } from '@elysiajs/swagger';
 import { authRoutes } from './modules/auth';
 import { taskRoutes } from './modules/tasks';
 
-const app = new Elysia()
+export const app = new Elysia()
   .use(cors())
   .use(
     swagger({
@@ -22,21 +22,21 @@ const app = new Elysia()
       },
     })
   )
-  // Health check
   .get('/', () => ({
     status: 'ok',
     message: 'Todoro API is running',
     timestamp: new Date().toISOString(),
   }))
-  // API Routes
-  .group('/api/v1', (app) => app.use(authRoutes).use(taskRoutes))
+  .group('/api/v1', (app) => app.use(authRoutes).use(taskRoutes));
 
-  .listen(process.env.PORT || 5000);
-
-console.log(
-  `Todoro API is running!
+// Hanya .listen() kalau BUKAN di environment Vercel
+if (!process.env.VERCEL) {
+  app.listen(process.env.PORT || 5000);
+  console.log(
+    `Todoro API is running!
 Server: http://${app.server?.hostname}:${app.server?.port}
 Swagger: http://${app.server?.hostname}:${app.server?.port}/swagger`
-);
+  );
+}
 
 export type App = typeof app;

@@ -4,7 +4,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "build": "bun run src/index.ts",
+    "build": "echo 'no build step required'",
     "postinstall": "prisma generate"
   },
   "dependencies": {
