@@ -100,7 +100,13 @@ export const login = async (dto: LoginRequestDto): Promise<LoginResult> => {
 };
 
 export const logout = async (token: string) => {
+  //cek dulu tokennya valid atau tidak
   await verifyToken(token);
+  
+  return {
+    message: "Logout success"
+  }
+
 }
 
 // INFO: Get user

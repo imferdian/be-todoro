@@ -1,4 +1,4 @@
-import { Elysia, ValidationError } from 'elysia';
+import { Context, Elysia, RouteSchema, ValidationError } from 'elysia';
 import { authMiddleware } from '../../middleware/auth';
 import { TaskError } from './task.error';
 import { AuthError } from '../auth/auth.error';
@@ -10,10 +10,42 @@ import {
   updateTaskController,
 } from './task.controller';
 import {
+  CreateTaskRequestDto,
   CreateTaskRequestSchema,
+  GetTaskParamsDto,
+  toCreateTaskDto,
+  toGetAllTaskDto,
+  toTaskDto,
+  toUpdateTaskDto,
+  UpdateTaskRequestDto,
   UpdateTaskRequestSchema,
 } from './dtos';
 import z from 'zod';
+import { createTask, getAllTasks, getTask, updateTask } from './task.services';
+import { IdParamsDto } from '../auth';
+
+type AuthenticatedContext<T extends RouteSchema ={}> = Context<T> & {
+  userId: string;
+  userEmail: string;
+}
+
+type GetAllTaskContext = AuthenticatedContext
+
+type GetTaskContext = AuthenticatedContext<{
+  params: GetTaskParamsDto
+}>;
+
+type CreateTaskContext = AuthenticatedContext<{
+  body: CreateTaskRequestDto;
+}>
+
+type UpdateTaskContext = AuthenticatedContext<{
+  body: UpdateTaskRequestDto
+}>
+
+type DeleteTaskContext = AuthenticatedContext<{
+  params: IdParamsDto
+}>;
 
 const TaskIdParamsSchema = z.object({
   taskId: z.uuid(),
@@ -55,7 +87,12 @@ export const taskRoutes = new Elysia({ prefix: '/tasks' })
 
   .use(authMiddleware)
 
-  .get('/', getAllTaskController as any, {
+  .get('/', async ({userId, set}: GetAllTaskContext) => {
+    const results = await getAllTasks(userId);
+
+    set.status = 200;
+    return toGetAllTaskDto(results);
+  }, {
     detail: {
       tags: ['Task'],
       summary: 'Get all tasks',
@@ -63,7 +100,12 @@ export const taskRoutes = new Elysia({ prefix: '/tasks' })
     },
   })
 
-  .get('/:taskId', getTaskController as any, {
+  .get('/:taskId', async ({params, userId, set}: GetTaskContext) => {
+      const result = await getTask(params, userId)
+
+      set.status = 200;
+      return toTaskDto(result);
+  }, {
     detail: {
       tags: ['Task'],
       summary: 'Get task by id',
@@ -71,7 +113,12 @@ export const taskRoutes = new Elysia({ prefix: '/tasks' })
     },
   })
 
-  .post('/', createTaskController as any, {
+  .post('/', async ({body, set, userId}: CreateTaskContext) => {
+      const result = await createTask(body, userId);
+
+      set.status = 201;
+      return toCreateTaskDto(result);
+  }, {
     body: CreateTaskRequestSchema,
     detail: {
       tags: ['Task'],
@@ -80,7 +127,12 @@ export const taskRoutes = new Elysia({ prefix: '/tasks' })
     },
   })
 
-  .patch('/:taskId', updateTaskController as any, {
+  .patch('/:taskId', async ({body, userId, set}: UpdateTaskContext) => {
+      const result = await updateTask(body, userId);
+
+      set.status = 200;
+      return toUpdateTaskDto(result);
+  }, {
     params: TaskIdParamsSchema,
     body: UpdateTaskRequestSchema,
     detail: {
@@ -90,11 +142,13 @@ export const taskRoutes = new Elysia({ prefix: '/tasks' })
     },
   })
 
-  .delete('/:taskId', deleteTaskController as any, {
-    params: TaskIdParamsSchema,
-    detail: {
-      tags: ['Task'],
-      summary: 'Delete task',
-      description: 'Delete task',
-    },
-  });
+  // .delete('/:taskId', async ({params, userId, set}: DeleteTaskContext) => {
+
+  // }, {
+  //   params: TaskIdParamsSchema,
+  //   detail: {
+  //     tags: ['Task'],
+  //     summary: 'Delete task',
+  //     description: 'Delete task',
+  //   },
+  // });

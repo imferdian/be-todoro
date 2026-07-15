@@ -1,4 +1,4 @@
-import { Elysia, ValidationError } from 'elysia';
+import { Context, Elysia, ValidationError } from 'elysia';
 import {
   registerController,
   loginController,
@@ -10,11 +10,31 @@ import {
 import { AuthError } from './auth.error';
 
 import {
+  LoginRequestDto,
   LoginRequestSchema,
+  RegisterRequestDto,
   RegisterRequestSchema,
   ResendVerificationRequestSchema,
+  toGetUserResponse,
+  toLoginResponse,
+  toRegisteredResponse,
   VerifyEmailQuerySchema,
 } from './dtos';
+import { authServices } from '.';
+
+type RegisterContext = Context<{
+  body: RegisterRequestDto;
+}>;
+
+type LoginContext = Context<{
+  body: LoginRequestDto;
+}>
+
+type AuthenticatedContext = Context<{
+  headers: {
+    authorization?: string;
+  }
+}>
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
   // Handle Error
@@ -66,7 +86,12 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
   })
 
   // POST /auth/register
-  .post('/register', registerController, {
+  .post('/register', async ({ body, set }: RegisterContext) => {
+    const result = await authServices.register(body);
+  
+    set.status = 201;
+    return toRegisteredResponse(result.token, result.user);
+  }, {
     body: RegisterRequestSchema,
     detail: {
       tags: ['Auth'],
@@ -76,7 +101,11 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
   })
 
   // POST /auth/login
-  .post('/login', loginController, {
+  .post('/login', async ({ body }: LoginContext) => {
+    const result = await authServices.login(body);
+
+    return toLoginResponse(result.token, result.expiresAt);
+  }, {
     body: LoginRequestSchema,
     detail: {
       tags: ['Auth'],
@@ -86,7 +115,20 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
   })
 
   // GET /auth/me
-  .get('/me', getMeController, {
+  .get('/me', async ({ headers }: AuthenticatedContext) => {
+    const authHeader = headers.authorization;
+
+    if (!authHeader?.startsWith('Bearer')){
+      throw new AuthError('Authorization required', 'UNAUTHORIZED')
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const decode = await authServices.verifyToken(token)
+
+    const user = await authServices.getUserById(decode.userId);
+
+    return toGetUserResponse(user);
+  }, {
     detail: {
       tags: ['Auth'],
       summary: 'Get current user',
@@ -95,7 +137,16 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     },
   })
   
-  .post('/logout', logoutController, {
+  .post('/logout', async ({headers}: AuthenticatedContext) => {
+      const authHeader = headers.authorization;
+
+      if(!authHeader?.startsWith('Bearer ')){
+        throw new AuthError('Authorization required','UNAUTHORIZED')
+      }
+
+      const token = authHeader.replace('Bearer ','')
+      await authServices.logout(token);
+  }, {
     detail: {
       tags: ['Auth'],
       summary: 'Logout user',
