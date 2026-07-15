@@ -1,13 +1,17 @@
 import cors from '@elysiajs/cors';
 import { Elysia } from 'elysia';
-import { swagger } from '@elysiajs/swagger';
+import { openapi } from '@elysiajs/openapi';
 import { authRoutes } from './modules/auth/index';
 import { taskRoutes } from './modules/tasks/index';
+import { z } from 'zod'
 
 const app = new Elysia()
   .use(cors())
   .use(
-    swagger({
+    openapi({
+      mapJsonSchema: {
+        zod: z.toJSONSchema,
+      },
       documentation: {
         info: {
           title: 'Todoro API',
@@ -35,7 +39,7 @@ if (!process.env.VERCEL) {
   console.log(
     `Todoro API is running!
 Server: http://${app.server?.hostname}:${app.server?.port}
-Swagger: http://${app.server?.hostname}:${app.server?.port}/swagger`
+OpenAPI: http://${app.server?.hostname}:${app.server?.port}/openapi`
   );
 }
 
