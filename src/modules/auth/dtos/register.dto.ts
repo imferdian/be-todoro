@@ -7,15 +7,21 @@ export const RegisterRequestSchema = z.object({
     .string({ error: 'Name must be a string' })
     .min(2, 'Name must be at least 2 characters long')
     .max(100, 'Name must be at most 100 characters long')
-    .describe('Nama pengguna'),
+    .meta({
+      description: 'Nama Pengguna'
+    }),
   email: z
     .email('Invalid email address')
-    .describe("Alamat email yang akan digunakan untuk login"),
+    .meta({
+      description: 'Alamat email yang akan digunakan untuk login'
+    }),
   password: z
     .string({ error: 'Password must be a string' })
     .min(6, 'Password must be at least 6 characters long')
     .max(100, 'Password must be at most 100 characters long')
-    .describe('Password minimal 6 karakter')
+    .meta({
+      description: 'Password minimal 6 karakter'
+    })
 });
 
 // Typescript Type infer dari schema
