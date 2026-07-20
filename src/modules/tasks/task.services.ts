@@ -46,10 +46,6 @@ export const getAllTasks = async (userId: string): Promise<TaskResult[]> => {
     },
   });
 
-  if (tasks.length === 0) {
-    throw new TaskError('Task not found', 'TASK_NOT_FOUND');
-  }
-
   return tasks.map((task) => ({
     id: task.id,
     title: task.title,
@@ -116,8 +112,8 @@ export const updateTask = async (
     throw new TaskError('Unauthorized', 'UNAUTHORIZED');
   }
 
-  if (dto.title === task.title) {
-    throw new TaskError('Task title is not changed', 'TASK_ALREADY_EXISTS');
+  if (dto.title === task.title && dto.description === task.description) {
+    throw new TaskError('Task not changed', 'TASK_ALREADY_EXISTS');
   }
 
   const updateTask = await prisma.tasks.update({

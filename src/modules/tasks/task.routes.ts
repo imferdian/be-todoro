@@ -130,7 +130,7 @@ export const taskRoutes = new Elysia({ prefix: '/tasks' })
     body: UpdateTaskRequestSchema,
     detail: {
       tags: ['Task'],
-      summary: 'Update task',
+      summary: 'Update task', 
       description: 'Update task',
     },
   })

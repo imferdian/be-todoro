@@ -48,7 +48,7 @@ model Todo {
 
   @@unique([todo, taskId])
 }
-
+ 
 model Pomodoro {
   id                 String       @id @default(uuid())
   session            Int
