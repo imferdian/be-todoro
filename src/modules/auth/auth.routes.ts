@@ -1,12 +1,4 @@
 import { Context, Elysia, ValidationError } from 'elysia';
-import {
-  registerController,
-  loginController,
-  getMeController,
-  getVerificationEmailController,
-  resendVerificationController,
-  logoutController,
-} from './auth.controller';
 import { AuthError } from './auth.error';
 
 import {
@@ -14,11 +6,9 @@ import {
   LoginRequestSchema,
   RegisterRequestDto,
   RegisterRequestSchema,
-  ResendVerificationRequestSchema,
   toGetUserResponse,
   toLoginResponse,
   toRegisteredResponse,
-  VerifyEmailQuerySchema,
 } from './dtos';
 import { authServices } from '.';
 
@@ -64,25 +54,6 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       message: 'Internal server error',
       code: 'INTERNAL_ERROR',
     };
-  })
-
-  // GET /auth/verify-email
-  .get('/verify-email', getVerificationEmailController, {
-    query: VerifyEmailQuerySchema,
-    detail: {
-      tags: ['Auth'],
-      summary: 'Verify email',
-      description: 'Verify email address',
-    },
-  })
-
-  .post('/resend-verification', resendVerificationController, {
-    body: ResendVerificationRequestSchema,
-    detail: {
-      tags: ['Auth'],
-      summary: 'Resend verification email',
-      description: 'Resend verification email to the user',
-    },
   })
 
   // POST /auth/register

@@ -3,17 +3,11 @@ import { authMiddleware } from '../../middleware/auth';
 import { TaskError } from './task.error';
 import { AuthError } from '../auth/auth.error';
 import {
-  createTaskController,
-  deleteTaskController,
-  getAllTaskController,
-  getTaskController,
-  updateTaskController,
-} from './task.controller';
-import {
   CreateTaskRequestDto,
   CreateTaskRequestSchema,
   GetTaskParamsDto,
   toCreateTaskDto,
+  toDeleteTaskDto,
   toGetAllTaskDto,
   toTaskDto,
   toUpdateTaskDto,
@@ -21,8 +15,7 @@ import {
   UpdateTaskRequestSchema,
 } from './dtos';
 import z from 'zod';
-import { createTask, getAllTasks, getTask, updateTask } from './task.services';
-import { IdParamsDto } from '../auth';
+import { createTask, deleteTask, getAllTasks, getTask, updateTask } from './task.services';
 
 type AuthenticatedContext<T extends RouteSchema ={}> = Context<T> & {
   userId: string;
@@ -44,7 +37,7 @@ type UpdateTaskContext = AuthenticatedContext<{
 }>
 
 type DeleteTaskContext = AuthenticatedContext<{
-  params: IdParamsDto
+  params: GetTaskParamsDto
 }>;
 
 const TaskIdParamsSchema = z.object({
@@ -142,13 +135,16 @@ export const taskRoutes = new Elysia({ prefix: '/tasks' })
     },
   })
 
-  // .delete('/:taskId', async ({params, userId, set}: DeleteTaskContext) => {
-
-  // }, {
-  //   params: TaskIdParamsSchema,
-  //   detail: {
-  //     tags: ['Task'],
-  //     summary: 'Delete task',
-  //     description: 'Delete task',
-  //   },
-  // });
+  .delete('/:taskId', async ({params, userId, set}: DeleteTaskContext) => {
+    await deleteTask(params.taskId, userId)
+    
+    set.status = 200;
+    return toDeleteTaskDto();
+  }, {
+    params: TaskIdParamsSchema,
+    detail: {
+      tags: ['Task'],
+      summary: 'Delete task',
+      description: 'Delete task',
+    },
+  });

@@ -40,7 +40,6 @@ export function toGetUserResponse(user: {
   id: string;
   name: string;
   email: string;
-  isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 }): GetUserResponseDto {

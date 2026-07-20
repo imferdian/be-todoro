@@ -14,21 +14,20 @@ datasource db {
 }
 
 model Users {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  name       String
-  password   String
-  isVerified Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  task       Tasks[]
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  task      Tasks[]
 }
 
 model Tasks {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
-  description String @default("")
-  user        Users  @relation(fields: [userId], references: [id])
+  description String   @default("")
+  user        Users    @relation(fields: [userId], references: [id])
   userId      String
   todo        Todo[]
   createdAt   DateTime @default(now())
@@ -38,38 +37,28 @@ model Tasks {
 }
 
 model Todo {
-  id                String          @id @default(uuid())
-  todo              String
-  session_target    Int
-  session_completed Int
-  duration          Int             @default(25)
-  short_break       Int             @default(5)
-  long_break        Int             @default(15)
-  status            Status_todo
-  task              Tasks           @relation(fields: [taskId], references: [id])
-  taskId            String
-  focus_session     Focus_session[]
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  id           String    @id @default(uuid())
+  todo         String
+  is_completed Boolean   @default(false)
+  task         Tasks     @relation(fields: [taskId], references: [id])
+  taskId       String
+  pomodoro     Pomodoro?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@unique([todo, taskId])
 }
 
-model Focus_session {
-  id               String       @id @default(uuid())
-  started_at       DateTime     @default(now())
-  ended_at         DateTime     @default(now())
-  duration_seconds Int
-  is_completed     Boolean
-  status           Status_focus
-  todo             Todo         @relation(fields: [todoId], references: [id])
-  todoId           String
-}
-
-enum Status_todo {
-  TODO
-  IN_PROGRESS
-  COMPLETED
+model Pomodoro {
+  id                 String       @id @default(uuid())
+  session            Int
+  duration_minutes   Int
+  break_time_minutes Int
+  total_time         DateTime
+  is_completed       Boolean      @default(false)
+  status             Status_focus
+  todo               Todo         @relation(fields: [todoId], references: [id])
+  todoId             String       @unique
 }
 
 enum Status_focus {

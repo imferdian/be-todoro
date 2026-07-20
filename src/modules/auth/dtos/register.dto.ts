@@ -38,7 +38,6 @@ export const RegisterResponseSchema = z.object({
       user: z.object({
         id: z.uuid(),
         email: z.email(),
-        isVerified: z.boolean(),
         name: z.string(),
         createdAt: z.date(),
         updatedAt: z.date(),
@@ -57,7 +56,6 @@ export function toRegisteredResponse(
     id: string;
     name: string;
     email: string;
-    isVerified: boolean;
     createdAt: Date;
     updatedAt: Date;
   }
@@ -70,7 +68,6 @@ export function toRegisteredResponse(
       user: {
         id: user.id,
         email: user.email,
-        isVerified: user.isVerified,
         name: user.name,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
